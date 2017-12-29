@@ -1,0 +1,40 @@
+#
+# Copyright SecureKey Technologies Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+version: '2'
+
+services:
+
+  fabric-sdk-pkcs11-integration-tests:
+    container_name: fabric-sdk-pkcs11-integration-test
+    image: softhsm2-image
+    environment:
+      - FABRIC_SDK_CLIENT_BCCSP_SECURITY_DEFAULT_PROVIDER=PKCS11
+      - GO_TAGS
+    volumes:
+      - ../../:/opt/gopath/src/github.com/hyperledger/fabric-sdk-go
+      - /opt/gopath/src/github.com/cloudflare/cfssl:/opt/gopath/src/github.com/cloudflare/cfssl
+      - /opt/gopath/src/github.com/golang/protobuf:/opt/gopath/src/github.com/golang/protobuf
+      - /opt/gopath/src/github.com/miekg/pkcs11:/opt/gopath/src/github.com/miekg/pkcs11
+      - /opt/gopath/src/github.com/mitchellh/mapstructure:/opt/gopath/src/github.com/mitchellh/mapstructure
+      - /opt/gopath/src/github.com/pkg/errors:/opt/gopath/src/github.com/pkg/errors
+      - /opt/gopath/src/golang.org/x/sync:/opt/gopath/src/golang.org/x/sync
+      - /opt/gopath/src/golang.org/x/crypto:/opt/gopath/src/golang.org/x/crypto
+      - /opt/gopath/src/golang.org/x/net:/opt/gopath/src/golang.org/x/net
+      - /opt/gopath/src/google.golang.org/grpc:/opt/gopath/src/google.golang.org/grpc
+      - /opt/gopath/src/github.com/spf13/viper:/opt/gopath/src/github.com/spf13/viper
+      - /opt/gopath/src/golang.org/x/text:/opt/gopath/src/golang.org/x/text
+      - /opt/gopath/src/google.golang.org/genproto:/opt/gopath/src/google.golang.org/genproto
+      - /opt/gopath/src/gopkg.in/yaml.v2:/opt/gopath/src/gopkg.in/yaml.v2
+      - /opt/gopath/src/github.com/spf13:/opt/gopath/src/github.com/spf13
+      - /opt/gopath/src/github.com/pelletier/go-toml:/opt/gopath/src/github.com/pelletier/go-toml
+      - /opt/gopath/src/github.com/magiconair/properties:/opt/gopath/src/github.com/magiconair/properties
+      - /opt/gopath/src/github.com/hashicorp/hcl:/opt/gopath/src/github.com/hashicorp/hcl
+      - /opt/gopath/src/github.com/fsnotify/fsnotify:/opt/gopath/src/github.com/fsnotify/fsnotify
+      - /opt/gopath/src/golang.org/x/sys/unix:/opt/gopath/src/golang.org/x/sys/unix
+    command: /opt/gopath/src/github.com/hyperledger/fabric-sdk-go/test/scripts/integration.sh
+    depends_on:
+      - orderer.example.com
+      - builder
