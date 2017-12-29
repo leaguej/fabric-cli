@@ -1,44 +1,29 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 
-	"github.com/leaguej/fabric-cli/chaincode"
-	"github.com/leaguej/fabric-cli/common"
-	cliConfig "github.com/leaguej/fabric-cli/config"
+	"github.com/leaguej/fabric-cli/btcd/btcec"
+	"github.com/leaguej/fabric-cli/digitalasset/util"
+	"github.com/leaguej/fabric-cli/sdk"
 )
 
 func CreateAccount() error {
-	var flags = &pflag.FlagSet{}
-	cliConfig.InitChannelID(flags, CHANNEL_DIGITAL_ASSET)
-	cliConfig.InitChaincodeID(flags, CHAINCODE_DIGITAL_ASSET)
-	cliConfig.InitConfigFile(flags)
-	cliConfig.InitLoggingLevel(flags)
-	cliConfig.InitUserName(flags)
-	cliConfig.InitUserPassword(flags)
-	cliConfig.InitOrdererTLSCertificate(flags)
-	//cliConfig.InitPrintFormat(flags, "json")
-	cliConfig.InitWriter(flags)
-	cliConfig.InitOrgIDs(flags)
 
-	cliConfig.InitIterations(flags)
-	cliConfig.InitSleepTime(flags)
-	cliConfig.InitTimeout(flags)
-
-	action, err := chaincode.NewInvokeAction(&pflag.FlagSet{})
+	setup, err := sdk.NewSdkClient()
 	if err != nil {
 		return err
 	}
 
-	defer action.Terminate()
+	defer setup.Close()
 
 	curve := btcec.S256()
 	priKey, _ := btcec.NewPrivateKey(curve)
 	pubKey := priKey.PubKey()
 
-	addr, _ := PublicKeyToAddress(pubKey)
+	addr, _ := util.PublicKeyToAddress(pubKey.SerializeUncompressed())
 
 	method := "create_account"
 	header := fmt.Sprintf(`{"addr":"%s","ts":%d,"note":"test create account"}`,
@@ -59,12 +44,7 @@ func CreateAccount() error {
 	//	beego.Info("message is: " + message)
 	//	beego.Info("sign is: " + sign)
 
-	args := &common.ArgStruct{
-		Func: "invoke",
-		Args: []string{method, header, content, sign},
-	}
-
-	err = action.Invoke(args)
+	result, err := setup.InvokeChainCode(method, header, content, sign)
 	if err != nil {
 		return err
 	}
@@ -73,13 +53,8 @@ func CreateAccount() error {
 		", addr: " + addr +
 		", public key: " + hex.EncodeToString(pubKey.SerializeUncompressed())
 
-	has_error := false
-	if action.Response_Status < 0 {
-		has_error = true
-	}
-
-	fmt.Printf("error=%s, message=%s, payload=%s\n", has_error,
-		action.Response_Message+"\n"+message, action.Response_Payload)
+	fmt.Printf("message=%s, payload=%s\n",
+		result+"\n"+message, result)
 
 	return nil
 }
