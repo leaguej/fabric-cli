@@ -2,9 +2,11 @@ package sdk
 
 import (
 	"encoding/base64"
-	"encoding/json"
+	//"encoding/json"
 	"strconv"
 	"strings"
+
+	"github.com/leaguej/fabric-cli/printer"
 
 	fabricCommon "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
 )
@@ -42,12 +44,18 @@ func (testSetup *BaseSetupImpl) QueryBlock(blockID string, bHash bool) (string, 
 		}
 	}
 
-	data, err := json.Marshal(block)
-	if err != nil {
-		return "", err
-	}
+	//	data, err := json.Marshal(block)
+	//	if err != nil {
+	//		return "", err
+	//	}
 
-	return string(data), nil
+	//	return string(data), nil
+	p := printer.NewBlockPrinter(printer.JSON, printer.BUFFER)
+	p.PrintBlock(block)
+
+	str, err := p.ToString()
+
+	return str, err
 }
 
 func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, error) {
@@ -56,10 +64,14 @@ func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, error) {
 		return "", err
 	}
 
-	data, err := json.Marshal(tx)
-	if err != nil {
-		return "", err
-	}
+	//	data, err := json.Marshal(tx)
+	//	if err != nil {
+	//		return "", err
+	//	}
+	p := printer.NewBlockPrinter(printer.JSON, printer.BUFFER)
+	p.PrintProcessedTransaction(tx)
 
-	return string(data), nil
+	str, err := p.ToString()
+
+	return str, err
 }
