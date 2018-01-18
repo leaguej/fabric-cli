@@ -2,7 +2,7 @@ package sdk
 
 import (
 	"encoding/base64"
-	//"encoding/json"
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -58,10 +58,10 @@ func (testSetup *BaseSetupImpl) QueryBlock(blockID string, bHash bool) (string, 
 	return str, err
 }
 
-func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, error) {
+func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, string, error) {
 	tx, err := testSetup.Channel.QueryTransaction(txID)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	//	data, err := json.Marshal(tx)
@@ -73,5 +73,30 @@ func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, error) {
 
 	str, err := p.ToString()
 
-	return str, err
+	txData := &TransactionData{}
+	err = json.Unmarshal([]byte(str), txData)
+	if err != nil {
+		return "", "", err
+	}
+
+	simpleData := &TxSimpleData{}
+	simpleData.TxID = txData.Payload.Header.ChannelHeader.TxID
+	resp := &txData.Payload.Data.Actions[0].Payload.Action.ProposalResponsePayload.Extension.Response
+	simpleData.Response.Message = resp.Message
+	simpleData.Response.Payload = resp.Payload
+	simpleData.Response.Status = resp.Status
+
+	nsRWs := txData.Payload.Data.Actions[0].Payload.Action.ProposalResponsePayload.Extension.Results.NsRWs
+	for _, nsRW := range nsRWs {
+		for _, write := range nsRW.KvRwSet.Writes {
+			if strings.HasPrefix(write.Key, "DigitalAsset_last_request_") {
+				simpleData.Request = write.Value
+				break
+			}
+		}
+	}
+
+	simpleStr, _ := json.Marshal(simpleData)
+
+	return str, string(simpleStr), err
 }
