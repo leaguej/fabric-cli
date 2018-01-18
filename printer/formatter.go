@@ -8,6 +8,7 @@ package printer
 
 import (
 	"fmt"
+	//"reflect"
 	"strings"
 )
 
@@ -209,7 +210,20 @@ func (p *jsonFormatter) Field(field string, value interface{}) {
 	}
 
 	if value != nil {
-		p.write("\"%s\":\"%v\"", field, value)
+		switch value.(type) {
+		case int:
+			p.write("\"%s\":%v", field, value)
+		default:
+			str0 := fmt.Sprintf("%v", value)
+			str2 := strings.Replace(str0, `\`, `\\`, -1)
+			str2 = strings.Replace(str2, "\n", `\n`, -1)
+			str2 = strings.Replace(str2, "\r", `\r`, -1)
+			str2 = strings.Replace(str2, `"`, `\"`, -1)
+
+			fmt.Println(str0 + " --> " + str2)
+
+			p.write("\"%s\":\"%v\"", field, str2)
+		}
 	} else {
 		p.write("\"%s\":\"null\"", field)
 	}
