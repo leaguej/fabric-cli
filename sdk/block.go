@@ -58,6 +58,53 @@ func (testSetup *BaseSetupImpl) QueryBlock(blockID string, bHash bool) (string, 
 	return str, err
 }
 
+func (testSetup *BaseSetupImpl) QueryBlockObject(blockID string, bHash bool) (*BlockData, error) {
+	var block *fabricCommon.Block
+
+	if !bHash {
+		num, err := strconv.Atoi(blockID)
+		if err != nil {
+			num = -1
+		}
+		block, err = testSetup.Channel.QueryBlock(num)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		hashBytes, err := Base64URLDecode(blockID)
+		if err != nil {
+			return nil, err
+		}
+
+		block, err = testSetup.Channel.QueryBlockByHash(hashBytes)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	//	data, err := json.Marshal(block)
+	//	if err != nil {
+	//		return "", err
+	//	}
+
+	//	return string(data), nil
+	p := printer.NewBlockPrinter(printer.JSON, printer.BUFFER)
+	p.PrintBlock(block)
+
+	str, err := p.ToString()
+	if err != nil {
+		return nil, err
+	}
+
+	data := &BlockData{}
+	err = json.Unmarshal([]byte(str), data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, err
+}
+
 func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, string, error) {
 	tx, err := testSetup.Channel.QueryTransaction(txID)
 	if err != nil {
