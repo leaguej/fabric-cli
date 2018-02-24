@@ -1,9 +1,9 @@
 package sdk
 
-const (
-	DEFAULT_CHANNEL_NAME        = "mychannel"
-	DEFAULT_ORG_ID              = "Org1"
-	DEFAULT_CONFIG_FILE         = "./fixtures/config/config_test.yaml"
-	DEFAULT_CHANNEL_CONFIG_FILE = "./fixtures/channel/mychannel.tx"
-	CHAIN_CODE_ID               = "dasset15"
+var (
+	DEFAULT_CHANNEL_NAME        string = "mychannel"
+	DEFAULT_ORG_ID              string = "Org1"
+	DEFAULT_CONFIG_FILE         string = "./fixtures/config/config_test.yaml"
+	DEFAULT_CHANNEL_CONFIG_FILE string = "./fixtures/channel/mychannel.tx"
+	CHAIN_CODE_ID               string = "dasset16"
 )

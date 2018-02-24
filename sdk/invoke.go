@@ -15,7 +15,7 @@ type InvokeReturnData struct {
 	Nonce string `json:"nonce"`
 }
 
-func (testSetup *BaseSetupImpl) InvokeChainCode(method, header, content, sign string) (string, error) {
+func (testSetup *BaseSetupImpl) InvokeChainCode(method, content, sign string) (string, error) {
 
 	//	eventID := "test([a-zA-Z]+)"
 
@@ -25,7 +25,6 @@ func (testSetup *BaseSetupImpl) InvokeChainCode(method, header, content, sign st
 
 	invokeArgs := [][]byte{
 		[]byte(method),
-		[]byte(header),
 		[]byte(content),
 		[]byte(sign),
 	}
