@@ -250,7 +250,7 @@ func (setup *BaseSetupImpl) initialize() error {
 	return nil
 }
 
-func NewSdkClient() (*BaseSetupImpl, error) {
+func DefaultSdkClient() (*BaseSetupImpl, error) {
 	//fmt.Printf("start test\n")
 
 	testSetup := &BaseSetupImpl{
@@ -261,10 +261,13 @@ func NewSdkClient() (*BaseSetupImpl, error) {
 		ConnectEventHub: true,
 		ChainCodeID:     CHAIN_CODE_ID,
 	}
+	return testSetup, nil
+}
 
+func (testSetup *BaseSetupImpl) Init() error {
 	if err := testSetup.initialize(); err != nil {
 		//t.Fatalf(err.Error())
-		return nil, err
+		return err
 	}
 
 	// Create SDK setup for the integration tests
@@ -278,14 +281,30 @@ func NewSdkClient() (*BaseSetupImpl, error) {
 	sdk, err := deffab.NewSDK(sdkOptions)
 	if err != nil {
 		//t.Fatalf("Failed to create new SDK: %s", err)
-		return nil, err
+		return err
 	}
 
 	chClient, err := sdk.NewChannelClient(testSetup.ChannelID, "User1")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	testSetup.ChannelClient = chClient
+
+	return err
+}
+
+func NewSdkClient() (*BaseSetupImpl, error) {
+	//fmt.Printf("start test\n")
+
+	testSetup := &BaseSetupImpl{
+		ConfigFile:      DEFAULT_CONFIG_FILE,
+		ChannelID:       DEFAULT_CHANNEL_NAME,
+		OrgID:           DEFAULT_ORG_ID,
+		ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
+		ConnectEventHub: true,
+		ChainCodeID:     CHAIN_CODE_ID,
+	}
+	err := testSetup.Init()
 
 	return testSetup, err
 }
