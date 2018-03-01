@@ -95,3 +95,23 @@ func (testSetup *BaseSetupImpl) QueryChainCode(method, filter string) (string, e
 	fmt.Printf("result1=%s\n", result1)
 	return string(result1), nil
 }
+
+func (testSetup *BaseSetupImpl) QueryChainCodeWithParams(params [][]byte) (string, error) {
+
+	//	invokeArgs := [][]byte{
+	//		[]byte(method),
+	//		[]byte(filter),
+	//	}
+	request := apitxn.QueryRequest{
+		ChaincodeID: testSetup.ChainCodeID,
+		Fcn:         "invoke",
+		Args:        params,
+	}
+	result1, err := testSetup.ChannelClient.Query(request)
+	if err != nil {
+		//fmt.Printf("Failed to create account: %s\n", err)
+		return "", err
+	}
+	fmt.Printf("result1=%s\n", result1)
+	return string(result1), nil
+}
