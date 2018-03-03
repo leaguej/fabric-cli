@@ -84,7 +84,7 @@ func (testSetup *BaseSetupImpl) QueryChainCode(method, filter string) (string, e
 	}
 	request := apitxn.QueryRequest{
 		ChaincodeID: testSetup.ChainCodeID,
-		Fcn:         "invoke",
+		Fcn:         "query",
 		Args:        invokeArgs,
 	}
 	result1, err := testSetup.ChannelClient.Query(request)
@@ -104,7 +104,7 @@ func (testSetup *BaseSetupImpl) QueryChainCodeWithParams(params [][]byte) (strin
 	//	}
 	request := apitxn.QueryRequest{
 		ChaincodeID: testSetup.ChainCodeID,
-		Fcn:         "invoke",
+		Fcn:         "query",
 		Args:        params,
 	}
 	result1, err := testSetup.ChannelClient.Query(request)
