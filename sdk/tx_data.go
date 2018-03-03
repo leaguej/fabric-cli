@@ -1,5 +1,11 @@
 package sdk
 
+type TxWrite struct {
+	Key      string `json:"Key"`
+	IsDelete string `json:"IsDelete"`
+	Value    string `json:"Value"`
+}
+
 type TxSimpleData struct {
 	TxID     string `json:"TxId"`
 	Request  string `json:"Request"`
@@ -8,6 +14,7 @@ type TxSimpleData struct {
 		Status  string `json:"Status"`
 		Payload string `json:"Payload"`
 	} `json:"Response"`
+	Writes []TxWrite `json:"Writes"`
 }
 
 type TransactionData struct {

@@ -72,7 +72,7 @@ func (testSetup *BaseSetupImpl) InvokeChainCode(method, content, sign string) (s
 	jsonResult, _ := json.Marshal(data)
 
 	//jsonResult := fmt.Sprintf(`{"txid":"%s", nonce="%s"}`, txID.ID, hex.EncodeToString(txID.Nonce))
-	fmt.Printf("result1=%s\n", jsonResult)
+	fmt.Printf("method=%s, result1=%s\n", method, jsonResult)
 	return string(jsonResult), nil
 }
 

@@ -132,13 +132,21 @@ func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, string, error) {
 	simpleData.Response.Message = resp.Message
 	simpleData.Response.Payload = resp.Payload
 	simpleData.Response.Status = resp.Status
+	simpleData.Writes = make([]TxWrite, 0)
 
 	nsRWs := txData.Payload.Data.Actions[0].Payload.Action.ProposalResponsePayload.Extension.Results.NsRWs
 	for _, nsRW := range nsRWs {
 		for _, write := range nsRW.KvRwSet.Writes {
-			if strings.HasPrefix(write.Key, "DigitalAsset_last_request_") {
+			if strings.HasPrefix(write.Key, "DigitalAsset_last_request_") ||
+				strings.HasPrefix(write.Key, "DA_last_request_") {
 				simpleData.Request = write.Value
-				break
+			} else {
+				txWrite := TxWrite{
+					Key:      write.Key,
+					IsDelete: write.IsDelete,
+					Value:    write.Value,
+				}
+				simpleData.Writes = append(simpleData.Writes, txWrite)
 			}
 		}
 	}
