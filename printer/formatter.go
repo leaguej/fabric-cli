@@ -282,6 +282,7 @@ func (p *jsonFormatter) ItemValue(element string, index interface{}, value inter
 		p.write(",")
 	}
 	p.write("\"%v\"", value)
+	p.commaRequired = true
 }
 
 func (p *jsonFormatter) Value(value interface{}) {
@@ -289,6 +290,7 @@ func (p *jsonFormatter) Value(value interface{}) {
 		p.write(",")
 	}
 	p.write("\"%v\"", value)
+	p.commaRequired = true
 }
 
 func (p *jsonFormatter) PrintHeader() {
