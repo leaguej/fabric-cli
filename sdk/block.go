@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	proto "github.com/golang/protobuf/proto"
 	"github.com/leaguej/fabric-cli/printer"
 
 	fabricCommon "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/common"
@@ -56,6 +57,49 @@ func (testSetup *BaseSetupImpl) QueryBlock(blockID string, bHash bool) (string, 
 	str, err := p.ToString()
 
 	return str, err
+}
+
+func (testSetup *BaseSetupImpl) QueryBlock2(blockID string, bHash bool) ([]byte, string, error) {
+	var block *fabricCommon.Block
+
+	if !bHash {
+		num, err := strconv.Atoi(blockID)
+		if err != nil {
+			num = -1
+		}
+		block, err = testSetup.Channel.QueryBlock(num)
+		if err != nil {
+			return nil, "", err
+		}
+	} else {
+		hashBytes, err := Base64URLDecode(blockID)
+		if err != nil {
+			return nil, "", err
+		}
+
+		block, err = testSetup.Channel.QueryBlockByHash(hashBytes)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
+	//	data, err := json.Marshal(block)
+	//	if err != nil {
+	//		return "", err
+	//	}
+
+	//	return string(data), nil
+	p := printer.NewBlockPrinter(printer.JSON, printer.BUFFER)
+	p.PrintBlock(block)
+
+	data, err := proto.Marshal(block)
+	if err != nil {
+		return nil, "", err
+	}
+
+	str, err := p.ToString()
+
+	return data, str, err
 }
 
 func (testSetup *BaseSetupImpl) QueryBlockObject(blockID string, bHash bool) (*BlockData, error) {
