@@ -219,6 +219,7 @@ func (p *jsonFormatter) Field(field string, value interface{}) {
 			str2 = strings.Replace(str2, "\n", `\n`, -1)
 			str2 = strings.Replace(str2, "\r", `\r`, -1)
 			str2 = strings.Replace(str2, `"`, `\"`, -1)
+			str2 = strings.Replace(str2, "\x00", `\t`, -1)
 
 			//fmt.Println(str0 + " --> " + str2)
 
