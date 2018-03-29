@@ -4,14 +4,14 @@ import (
 	"fmt"
 	//"os"
 	//"path"
-	"time"
+	//"time"
 
 	"github.com/hyperledger/fabric-sdk-go/api/apiconfig"
 	ca "github.com/hyperledger/fabric-sdk-go/api/apifabca"
 	fab "github.com/hyperledger/fabric-sdk-go/api/apifabclient"
 	"github.com/hyperledger/fabric-sdk-go/api/apitxn"
-	chmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/chmgmtclient"
-	resmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/resmgmtclient"
+	//chmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/chmgmtclient"
+	//resmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/resmgmtclient"
 	//packager "github.com/hyperledger/fabric-sdk-go/pkg/fabric-client/ccpackager/gopackager"
 	//pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
 
@@ -33,12 +33,13 @@ type BaseSetupImpl struct {
 	ConnectEventHub bool
 	ConfigFile      string
 	OrgID           string
+	AdminUserName   string
 	ChannelID       string
 	ChainCodeID     string
 	Initialized     bool
-	ChannelConfig   string
-	AdminUser       ca.User
-	ChannelClient   apitxn.ChannelClient
+	//ChannelConfig   string
+	AdminUser     ca.User
+	ChannelClient apitxn.ChannelClient
 }
 
 // GetChannel initializes and returns a channel based on config
@@ -149,9 +150,10 @@ func (setup *BaseSetupImpl) getEventHub(client fab.FabricClient) (fab.EventHub, 
 	return eventHub, nil
 }
 
+/*
 func (setup *BaseSetupImpl) ensureJoinChannel(sdk *deffab.FabricSDK) error {
 	// Channel management client is responsible for managing channels (create/update)
-	chMgmtClient, err := sdk.NewChannelMgmtClientWithOpts("Admin",
+	chMgmtClient, err := sdk.NewChannelMgmtClientWithOpts(setup.AdminUserName,
 		&deffab.ChannelMgmtClientOpts{OrgName: "ordererorg"})
 	if err != nil {
 		//t.Fatalf("Failed to create new channel management client: %s", err)
@@ -161,7 +163,7 @@ func (setup *BaseSetupImpl) ensureJoinChannel(sdk *deffab.FabricSDK) error {
 	var resMgmtClient resmgmt.ResourceMgmtClient
 
 	// Resource management client is responsible for managing resources (joining channels, install/instantiate/upgrade chaincodes)
-	resMgmtClient, err = sdk.NewResourceMgmtClient("Admin")
+	resMgmtClient, err = sdk.NewResourceMgmtClient(setup.AdminUserName)
 	if err != nil {
 		//t.Fatalf("Failed to create new resource management client: %s", err)
 		return errors.WithMessage(err, "Failed to create new channel resource management client")
@@ -176,7 +178,7 @@ func (setup *BaseSetupImpl) ensureJoinChannel(sdk *deffab.FabricSDK) error {
 	if !alreadyJoined {
 
 		// Channel config signing user (has to belong to one of channel orgs)
-		org1Admin, err := sdk.NewPreEnrolledUser("Org1", "Admin")
+		org1Admin, err := sdk.NewPreEnrolledUser(setup.OrgID, setup.AdminUserName)
 		if err != nil {
 			return errors.WithMessage(err, "failed getting Org1 admin user")
 		}
@@ -205,6 +207,7 @@ func (setup *BaseSetupImpl) ensureJoinChannel(sdk *deffab.FabricSDK) error {
 
 	return nil
 }
+*/
 
 // Initialize reads configuration from file and sets up client, channel and event hub
 func (setup *BaseSetupImpl) initialize() error {
@@ -218,8 +221,10 @@ func (setup *BaseSetupImpl) initialize() error {
 		return errors.WithMessage(err, "SDK init failed")
 	}
 
-	session, err := sdk.NewPreEnrolledUserSession(setup.OrgID, "Admin")
+	session, err := sdk.NewPreEnrolledUserSession(setup.OrgID, setup.AdminUserName)
 	if err != nil {
+		fmt.Printf("AdminUserName=%v\n", setup.AdminUserName)
+		fmt.Printf("OrgID=%v\n", setup.OrgID)
 		return errors.WithMessage(err, "failed getting admin user session for org")
 	}
 
@@ -254,12 +259,13 @@ func DefaultSdkClient() (*BaseSetupImpl, error) {
 	//fmt.Printf("start test\n")
 
 	testSetup := &BaseSetupImpl{
-		ConfigFile:      DEFAULT_CONFIG_FILE,
-		ChannelID:       DEFAULT_CHANNEL_NAME,
-		OrgID:           DEFAULT_ORG_ID,
-		ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
+		ConfigFile: DEFAULT_CONFIG_FILE,
+		ChannelID:  DEFAULT_CHANNEL_NAME,
+		OrgID:      DEFAULT_ORG_ID,
+		//ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
 		ConnectEventHub: true,
 		ChainCodeID:     CHAIN_CODE_ID,
+		AdminUserName:   DEFAULT_ADMIN_USER_NAME,
 	}
 	return testSetup, nil
 }
@@ -296,15 +302,20 @@ func (testSetup *BaseSetupImpl) Init() error {
 func NewSdkClient() (*BaseSetupImpl, error) {
 	//fmt.Printf("start test\n")
 
-	testSetup := &BaseSetupImpl{
-		ConfigFile:      DEFAULT_CONFIG_FILE,
-		ChannelID:       DEFAULT_CHANNEL_NAME,
-		OrgID:           DEFAULT_ORG_ID,
-		ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
-		ConnectEventHub: true,
-		ChainCodeID:     CHAIN_CODE_ID,
+	//	testSetup := &BaseSetupImpl{
+	//		ConfigFile: DEFAULT_CONFIG_FILE,
+	//		ChannelID:  DEFAULT_CHANNEL_NAME,
+	//		OrgID:      DEFAULT_ORG_ID,
+	//		//ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
+	//		ConnectEventHub: true,
+	//		ChainCodeID:     CHAIN_CODE_ID,
+	//	}
+	testSetup, err := DefaultSdkClient()
+	if err != nil {
+		return nil, err
 	}
-	err := testSetup.Init()
+
+	err = testSetup.Init()
 
 	return testSetup, err
 }
