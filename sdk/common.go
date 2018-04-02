@@ -10,6 +10,7 @@ import (
 	ca "github.com/hyperledger/fabric-sdk-go/api/apifabca"
 	fab "github.com/hyperledger/fabric-sdk-go/api/apifabclient"
 	"github.com/hyperledger/fabric-sdk-go/api/apitxn"
+	"github.com/spf13/afero"
 	//chmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/chmgmtclient"
 	//resmgmt "github.com/hyperledger/fabric-sdk-go/api/apitxn/resmgmtclient"
 	//packager "github.com/hyperledger/fabric-sdk-go/pkg/fabric-client/ccpackager/gopackager"
@@ -25,21 +26,42 @@ import (
 	//"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/common/cauthdsl"
 )
 
+var mConfig_Data []byte = nil
+
 // BaseSetupImpl implementation of BaseTestSetup
 type BaseSetupImpl struct {
 	Client          fab.FabricClient
 	Channel         fab.Channel
 	EventHub        fab.EventHub
 	ConnectEventHub bool
-	ConfigFile      string
-	OrgID           string
-	AdminUserName   string
-	ChannelID       string
-	ChainCodeID     string
-	Initialized     bool
+
+	//ConfigFile      string
+	ConfigBytes []byte
+
+	OrgID         string
+	AdminUserName string
+	ChannelID     string
+	ChainCodeID   string
+	Initialized   bool
 	//ChannelConfig   string
 	AdminUser     ca.User
 	ChannelClient apitxn.ChannelClient
+}
+
+func InitDefaultConfigBytes() error {
+	fs := afero.NewOsFs()
+	file, err := afero.ReadFile(fs, DEFAULT_CONFIG_FILE)
+
+	if err == nil {
+		mConfig_Data = file
+	}
+
+	if mConfig_Data != nil {
+		fmt.Printf(string(mConfig_Data))
+	} else {
+		fmt.Printf("mConfig_Data is nil\n")
+	}
+	return err
 }
 
 // GetChannel initializes and returns a channel based on config
@@ -213,7 +235,9 @@ func (setup *BaseSetupImpl) ensureJoinChannel(sdk *deffab.FabricSDK) error {
 func (setup *BaseSetupImpl) initialize() error {
 	// Create SDK setup for the integration tests
 	sdkOptions := deffab.Options{
-		ConfigFile: setup.ConfigFile,
+		//ConfigFile: setup.ConfigFile,
+		ConfigByte: mConfig_Data,
+		ConfigType: "yaml",
 	}
 
 	sdk, err := deffab.NewSDK(sdkOptions)
@@ -259,9 +283,11 @@ func DefaultSdkClient() (*BaseSetupImpl, error) {
 	//fmt.Printf("start test\n")
 
 	testSetup := &BaseSetupImpl{
-		ConfigFile: DEFAULT_CONFIG_FILE,
-		ChannelID:  DEFAULT_CHANNEL_NAME,
-		OrgID:      DEFAULT_ORG_ID,
+		//ConfigFile: DEFAULT_CONFIG_FILE,
+		ConfigBytes: mConfig_Data,
+
+		ChannelID: DEFAULT_CHANNEL_NAME,
+		OrgID:     DEFAULT_ORG_ID,
 		//ChannelConfig:   DEFAULT_CHANNEL_CONFIG_FILE,
 		ConnectEventHub: true,
 		ChainCodeID:     CHAIN_CODE_ID,
@@ -271,6 +297,10 @@ func DefaultSdkClient() (*BaseSetupImpl, error) {
 }
 
 func (testSetup *BaseSetupImpl) Init() error {
+	if mConfig_Data == nil {
+		InitDefaultConfigBytes()
+	}
+
 	if err := testSetup.initialize(); err != nil {
 		//t.Fatalf(err.Error())
 		return err
@@ -278,7 +308,10 @@ func (testSetup *BaseSetupImpl) Init() error {
 
 	// Create SDK setup for the integration tests
 	sdkOptions := deffab.Options{
-		ConfigFile: testSetup.ConfigFile,
+		//ConfigFile: testSetup.ConfigFile,
+		ConfigByte: mConfig_Data,
+		ConfigType: "yaml",
+
 		StateStoreOpts: opt.StateStoreOpts{
 			Path: "/tmp/enroll_user",
 		},
