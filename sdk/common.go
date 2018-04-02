@@ -40,9 +40,11 @@ type BaseSetupImpl struct {
 
 	OrgID         string
 	AdminUserName string
-	ChannelID     string
-	ChainCodeID   string
-	Initialized   bool
+	UserName      string
+
+	ChannelID   string
+	ChainCodeID string
+	Initialized bool
 	//ChannelConfig   string
 	AdminUser     ca.User
 	ChannelClient apitxn.ChannelClient
@@ -282,6 +284,10 @@ func (setup *BaseSetupImpl) initialize() error {
 func DefaultSdkClient() (*BaseSetupImpl, error) {
 	//fmt.Printf("start test\n")
 
+	if mConfig_Data == nil {
+		InitDefaultConfigBytes()
+	}
+
 	testSetup := &BaseSetupImpl{
 		//ConfigFile: DEFAULT_CONFIG_FILE,
 		ConfigBytes: mConfig_Data,
@@ -292,15 +298,12 @@ func DefaultSdkClient() (*BaseSetupImpl, error) {
 		ConnectEventHub: true,
 		ChainCodeID:     CHAIN_CODE_ID,
 		AdminUserName:   DEFAULT_ADMIN_USER_NAME,
+		UserName:        DEFAULT_USER_NAME,
 	}
 	return testSetup, nil
 }
 
 func (testSetup *BaseSetupImpl) Init() error {
-	if mConfig_Data == nil {
-		InitDefaultConfigBytes()
-	}
-
 	if err := testSetup.initialize(); err != nil {
 		//t.Fatalf(err.Error())
 		return err
@@ -323,7 +326,7 @@ func (testSetup *BaseSetupImpl) Init() error {
 		return err
 	}
 
-	chClient, err := sdk.NewChannelClient(testSetup.ChannelID, "User1")
+	chClient, err := sdk.NewChannelClient(testSetup.ChannelID, testSetup.UserName)
 	if err != nil {
 		return err
 	}
