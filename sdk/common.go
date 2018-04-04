@@ -358,5 +358,8 @@ func NewSdkClient() (*BaseSetupImpl, error) {
 
 func (setup *BaseSetupImpl) Close() error {
 	err := setup.ChannelClient.Close()
+
+	setup.EventHub.Disconnect()
+
 	return err
 }
