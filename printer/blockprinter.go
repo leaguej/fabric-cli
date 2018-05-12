@@ -26,9 +26,7 @@ import (
 
 	//  github.com\hyperledger\fabric-sdk-go\third_party\github.com\hyperledger\fabric\protos\peer\transaction.pb.go
 	pb "github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/protos/peer"
-
 	//"github.com/hyperledger/fabric/core/common/ccprovider"
-
 	//"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	//ledgerUtil "github.com/hyperledger/fabric/core/ledger/util"
 	//fabricMsp "github.com/hyperledger/fabric/msp"
@@ -220,8 +218,11 @@ func (p *BlockPrinter) PrintProcessedTransaction(tx *pb.ProcessedTransaction) {
 	}
 
 	p.PrintHeader()
-	p.Print("ValidationCode: %s", pb.TxValidationCode(tx.ValidationCode))
+	//p.Print("ValidationCode: %s", pb.TxValidationCode(tx.ValidationCode))
+	p.Field("ValidationCode", tx.ValidationCode)
+
 	p.PrintEnvelope(tx.TransactionEnvelope)
+
 	p.PrintFooter()
 }
 

@@ -11,20 +11,21 @@ type TxSimpleData struct {
 	Request  string `json:"Request"`
 	Response struct {
 		Message string `json:"Message"`
-		Status  string `json:"Status"`
+		Status  int32  `json:"Status"`
 		Payload string `json:"Payload"`
 	} `json:"Response"`
 	Writes []TxWrite `json:"Writes"`
 }
 
 type TransactionData struct {
-	Signature string `json:"Signature"`
-	Payload   struct {
+	ValidationCode int32  `json:"ValidationCode"`
+	Signature      string `json:"Signature"`
+	Payload        struct {
 		Header struct {
 			ChannelHeader struct {
 				Type      string `json:"Type"`
 				ChannelID string `json:"ChannelId"`
-				Epoch     string `json:"Epoch"`
+				Epoch     uint64 `json:"Epoch"`
 				Extension struct {
 					ChaincodeID struct {
 						Name    string `json:"Name"`
@@ -35,7 +36,7 @@ type TransactionData struct {
 				} `json:"Extension"`
 				Timestamp string `json:"Timestamp"`
 				TxID      string `json:"TxId"`
-				Version   string `json:"Version"`
+				Version   int32  `json:"Version"`
 			} `json:"ChannelHeader"`
 			SignatureHeader struct {
 				Nonce   string `json:"Nonce"`
@@ -60,7 +61,7 @@ type TransactionData struct {
 							Extension    struct {
 								Response struct {
 									Message string `json:"Message"`
-									Status  string `json:"Status"`
+									Status  int32  `json:"Status"`
 									Payload string `json:"Payload"`
 								} `json:"Response"`
 								Results struct {
@@ -70,8 +71,8 @@ type TransactionData struct {
 											Reads []struct {
 												Key     string `json:"Key"`
 												Version struct {
-													BlockNum string `json:"BlockNum"`
-													TxNum    string `json:"TxNum"`
+													BlockNum uint64 `json:"BlockNum"`
+													TxNum    uint64 `json:"TxNum"`
 												} `json:"Version"`
 											} `json:"Reads"`
 											Writes []struct {
@@ -117,7 +118,7 @@ type BlockData struct {
 					ChannelHeader struct {
 						Type      string `json:"Type"`
 						ChannelID string `json:"ChannelId"`
-						Epoch     string `json:"Epoch"`
+						Epoch     uint64 `json:"Epoch"`
 						Extension struct {
 							ChaincodeID struct {
 								Name    string `json:"Name"`
@@ -128,7 +129,7 @@ type BlockData struct {
 						} `json:"Extension"`
 						Timestamp string `json:"Timestamp"`
 						TxID      string `json:"TxId"`
-						Version   string `json:"Version"`
+						Version   int32  `json:"Version"`
 					} `json:"ChannelHeader"`
 					SignatureHeader struct {
 						Nonce   string `json:"Nonce"`
@@ -153,7 +154,7 @@ type BlockData struct {
 									Extension    struct {
 										Response struct {
 											Message string `json:"Message"`
-											Status  string `json:"Status"`
+											Status  int32  `json:"Status"`
 											Payload string `json:"Payload"`
 										} `json:"Response"`
 										Results struct {

@@ -211,7 +211,7 @@ func (p *jsonFormatter) Field(field string, value interface{}) {
 
 	if value != nil {
 		switch value.(type) {
-		case int:
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 			p.write("\"%s\":%v", field, value)
 		default:
 			str0 := fmt.Sprintf("%v", value)
