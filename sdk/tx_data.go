@@ -7,9 +7,10 @@ type TxWrite struct {
 }
 
 type TxSimpleData struct {
-	TxID     string `json:"TxId"`
-	Request  string `json:"Request"`
-	Response struct {
+	ValidationCode int32  `json:"ValidationCode"`
+	TxID           string `json:"TxId"`
+	Request        string `json:"Request"`
+	Response       struct {
 		Message string `json:"Message"`
 		Status  int32  `json:"Status"`
 		Payload string `json:"Payload"`

@@ -177,6 +177,7 @@ func (testSetup *BaseSetupImpl) QueryTx(txID string) (string, string, error) {
 	simpleData.Response.Payload = resp.Payload
 	simpleData.Response.Status = resp.Status
 	simpleData.Writes = make([]TxWrite, 0)
+	simpleData.ValidationCode = txData.ValidationCode
 
 	nsRWs := txData.Payload.Data.Actions[0].Payload.Action.ProposalResponsePayload.Extension.Results.NsRWs
 	for _, nsRW := range nsRWs {
